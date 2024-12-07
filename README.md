@@ -8,8 +8,10 @@ Tries to, when possible, reuse standard elisp functions and use standard Emacs n
 All functions are opt-in and you may pick and choose which commands you want and which key-sequences you would like to bind them to.
 
 ## Install
-Add the `beat+.el` file to your load path (e.g. `~/.config/emacs/elisp/`)
+You can install it automatically by running `M-x` `package-vc-install` `RET` `https://github.com/ImFstAsFckBoi/beatp`.
+You can also do it manually by adding the `beat+.el` file to your load path (e.g. `~/.config/emacs/elisp/`)
 
+If you don't have a custom load path, add it to your config like so
 ```elisp
 (add-to-list 'load-path "~/.config/emacs/elisp/")
 ```
