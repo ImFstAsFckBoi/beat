@@ -93,9 +93,9 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (next-line))
 
 
-(defun beatp-dwim-previous-line ()
+(defun beatp-dwim-previous-line (&optional ARG)
   "Mimic VS Code behaviour: Pressing up on the first line moves the cursor to column 0."
-  (interactive)
+  (interactive "^p")
   (if (eq (line-number-at-pos) 1)
       (goto-char 0)
       (previous-line)))
