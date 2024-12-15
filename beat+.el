@@ -71,10 +71,11 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
 (defun beatp-select-around-word ()
   "Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards"
   (interactive)
-  (right-word)
-  (left-word)
+  (if (not (eq (char-after) ? ))
+      (beatp-right-to-boundary))
+  (beatp-left-to-boundary)
   (set-mark (point))
-  (right-word)
+  (beatp-right-to-boundary)
   (activate-mark))
 
 (defun beatp-select-around-word-or-next-match ()
