@@ -92,6 +92,14 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (next-line))
 
 
+(defun beatp-dwim-previous-line ()
+  "Mimic VS Code behaviour: Pressing up on the first line moves the cursor to column 0."
+  (interactive)
+  (if (eq (line-number-at-pos) 1)
+      (goto-char 0)
+      (previous-line)))
+
+
 ; TODO:
 ; - use native char categories
 ; - don't use byte-to-string conversions

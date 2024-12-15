@@ -28,7 +28,8 @@ How i configure this (using [`use-package`](https://github.com/jwiegley/use-pack
         ("C-<right>" . beatp-right-to-boundary)
         ("C-<left>" . beatp-left-to-boundary)
         ("C-<delete>" . beatp-delete-right-to-boundary)
-        ("C-<backspace>" . beatp-delete-left-to-boundary))
+        ("C-<backspace>" . beatp-delete-left-to-boundary)
+        ("<up>" . beatp-dwim-previous-line))
 ```
 
 
@@ -46,6 +47,7 @@ How i configure this (using [`use-package`](https://github.com/jwiegley/use-pack
 |`beatp-select-around-word` | Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards|
 |`beatp-select-around-word-or-next-match` | Mimic VS Code functionality [C-d]: If nothing is marked, select word, if something is marked, select next instance of it.|
 |`beatp-duplicate-line-down` | Mimic VS Code functionality [M-S-\<down\>]: Duplicate line down.|
+|`beatp-dwim-previous-line` | "Mimic VS Code behaviour: Pressing up on the first line moves the cursor to column 0."|
 |`beatp-delete-right-to-boundary` | Mimic VS Code functionality [C-\<delete\>]: Deletes sequences forward, with more similar rules to VS Code.|
 |`beatp-delete-left-to-boundary` | Mimic VS Code functionality [C-\<backspace\>]: Deletes sequences backwards, with more similar rules to VS Code.|
 |`beatp-right-to-boundary` | Goto forward for all characters in the same char category.|
