@@ -70,9 +70,10 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
 
 
 (defun beat-select-around-word ()
-  "Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards"
+  "Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards."
   (interactive)
-  (if (not (eq (char-after) ? ))
+  ;; If at beginning of word, go to end first
+  (if (not (eq (char-after) ? )) ; "? " = space
       (beat-right-to-boundary))
   (beat-left-to-boundary)
   (set-mark (point))
@@ -95,9 +96,9 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (next-line))
 
 
-(defun beat-dwim-previous-line (&optional ARG)
-  "Mimic VS Code behaviour: Pressing up on the first line moves the cursor to column 0."
-  (interactive "^p")
+(defun beat-dwim-previous-line ()
+  "Mimic VS Code behavior: Pressing up on the first line move the cursor to column 0."
+  (interactive "^")
   (if (eq (line-number-at-pos) 1)
       (goto-char 0)
     (previous-line)))
@@ -122,61 +123,67 @@ If at first non white-space character, move to beginning of line"
                 (newline    "[\r\n]")
                 (words      "[a-zA-Z0-9_\\-]")))
 
-(defun beat--char-at (N)
-  (if (eq N 0) nil
+(defun beat--relative-char-at (N)
+  "Get the Nth char relative to point.  Negative N gives before point, positive after point.  N = 0 gives nil."
+  (when (eq N 0)
     (if (< N 1)
         (char-before (+ (point) (+ N 1)))
       (char-after  (+ (point)  (- N 1))))))
 
-
-(defun beat-eat-char (N)
-  (setq-local c (beat--char-at N))
-  (delete-char N)
-  c)
+(defun beat--eat-char (N)
+  "Delete N chars an return the Nth char."
+  (let ((c (beat--relative-char-at N)))
+    (delete-char N)
+    c))
 
 
 (defun beat--get-char-category (char)
+  "TODO: Replace.  Get the category of CHAR according to BEAT-CHAR-CATEGORIES."
   (catch 'r (dolist (cat beat-char-categories)
               (when (string-match (nth 1 cat) char)
                 (throw 'r (nth 0 cat))))))
 
 
-(defun beat--call-expression (f)
+(defun beat--eval-or-funcall (f)
+  "If F is a function, call it.  If F is an s-expression, evaluate it."
   (if (listp f)
-      (apply (car f) (cdr f))
+      (eval f)
     (funcall f)))
 
 (defun beat--apply-to-boundary (bexp aexp)
-  ;; Set b and a to same so first while always passes 
-  (setq-local b (char-before) a (char-before))
-  (while (eq (beat--get-char-category (byte-to-string b))
-             (beat--get-char-category (byte-to-string a)))
-    (if bexp (beat--call-expression bexp))
-    (setq-local b (char-before)
-                a (char-after))
-    (if aexp (beat--call-expression aexp))))
+  "Evaluate BEXP before, and AEXP after, every char up to a boundary."
+  ;; Set b and a to same so first while always passes
+  (let ((b (char-before))
+        (a (char-before)))
 
-(defun beat-delete-right-to-boundary () 
+    (while (eq (beat--get-char-category (byte-to-string b))
+               (beat--get-char-category (byte-to-string a)))
+      (when bexp (beat--eval-or-funcall bexp))
+      (setq b (char-before)
+            a (char-after))
+      (when aexp (beat--eval-or-funcall aexp)))))
+
+(defun beat-delete-right-to-boundary ()
   "Mimic VS Code functionality [C-<delete>]: Deletes sequences forward, with more similar rules to VS Code."
   (interactive)
   (beat--apply-to-boundary 'right-char '(delete-char -1)))
 
 
-(defun beat-delete-left-to-boundary () 
+(defun beat-delete-left-to-boundary ()
   "Mimic VS Code functionality [C-<backspace>]: Deletes sequences backwards, with more similar rules to VS Code."
   (interactive)
   (beat--apply-to-boundary 'left-char '(delete-char 1)))
 
 
-(defun beat-right-to-boundary (&optional ARG)
-  "Goto forward for all characters in the same char category."
-  (interactive "^p")
+(defun beat-right-to-boundary ()
+  "Go forward for all characters in the same char category."
+  (interactive "^")
   (beat--apply-to-boundary 'right-char nil))
 
 
-(defun beat-left-to-boundary (&optional ARG)
-  "Goto backward for all characters in the same char category."
-  (interactive "^p")
+(defun beat-left-to-boundary ()
+  "Go backward for all characters in the same char category."
+  (interactive "^")
   (beat--apply-to-boundary 'left-char nil))
 
 (provide 'beat)
