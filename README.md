@@ -1,4 +1,4 @@
-# BEAT+ - Buffer Editing And Traveral Plus
+# BEAT - Buffer Editing And Traveral
 
 Utility functions for Buffer Editing And Traversal (BEAT)
 
@@ -47,9 +47,11 @@ How i configure this (using [`use-package`](https://github.com/jwiegley/use-pack
 |`beat-select-around-word` | Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards|
 |`beat-select-around-word-or-next-match` | Mimic VS Code functionality [C-d]: If nothing is marked, select word, if something is marked, select next instance of it.|
 |`beat-duplicate-line-down` | Mimic VS Code functionality [M-S-\<down\>]: Duplicate line down.|
-|`beat-dwim-previous-line` | "Mimic VS Code behaviour: Pressing up on the first line moves the cursor to column 0."|
+|`beat-dwim-previous-line` | "Mimic VS Code behavior: Pressing up on the first line moves the cursor to column 0."|
 |`beat-delete-right-to-boundary` | Mimic VS Code functionality [C-\<delete\>]: Deletes sequences forward, with more similar rules to VS Code.|
 |`beat-delete-left-to-boundary` | Mimic VS Code functionality [C-\<backspace\>]: Deletes sequences backwards, with more similar rules to VS Code.|
-|`beat-right-to-boundary` | Goto forward for all characters in the same char category.|
-|`beat-left-to-boundary` | Goto backward for all characters in the same char category.|
+|`beat-right-to-boundary` | Go forward for all characters in the same char category.|
+|`beat-left-to-boundary` | Go backward for all characters in the same char category.|
+|`beat-dwim-move-beginning-of-line` | "Default behavior move to first non white-space character. If at first non white-space character, move to beginning of line"|
+
 

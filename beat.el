@@ -103,9 +103,19 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
     (previous-line)))
 
 
-                                        ; TODO:
-                                        ; - use native char categories
-                                        ; - don't use byte-to-string conversions
+(defun beat-dwim-move-beginning-of-line ()
+  "Default behavior move to first non white-space character.
+If at first non white-space character, move to beginning of line"
+  (interactive "^")
+  (let ((pos (point)))
+    (back-to-indentation)
+    (when (eq pos (point))
+      (beginning-of-line))))
+
+
+;; TODO:
+;; - use native char categories
+;; - don't use byte-to-string conversions
 
 (setq-default beat-char-categories
               '((whitespace "[ \t]")
