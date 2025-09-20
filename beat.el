@@ -60,7 +60,7 @@
     (kill-ring-save (line-beginning-position) (+ (line-end-position) 1))))
 
 
-(defun beat-delete-selection-yank ()
+(defun beat-delete-mark-yank ()
   "PARTIALLY OBSOLETE! FUNCTIONALITY COVERED BY 'delete-selection-mode'.
 Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (interactive)
@@ -69,7 +69,7 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (yank))
 
 
-(defun beat-select-around-word ()
+(defun beat-mark-around-word ()
   "Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards."
   (interactive)
   ;; If at beginning of word, go to end first
@@ -81,12 +81,12 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (activate-mark))
 
 
-(defun beat-select-around-word-or-next-match ()
-  "Mimic VS Code functionality [C-d]: If nothing is marked, select word, if something is marked, select next instance of it."
+(defun beat-mark-around-word-or-next-match ()
+  "Mimic VS Code functionality [C-d]: If nothing is marked, mark word, if something is marked, mark next instance of it."
   (interactive)
   (if (region-active-p)
       (mc/mark-next-like-this (region-beginning))
-    (beat-select-around-word)))
+    (beat-mark-around-word)))
 
 
 (defun beat-duplicate-line-down ()

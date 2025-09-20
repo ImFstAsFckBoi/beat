@@ -24,7 +24,7 @@ How i configure this (using [`use-package`](https://github.com/jwiegley/use-pack
 (use-package beat
   :bind ("C-w" . beat-dwim-kill)
         ("M-w" . beat-dwim-save)
-        ("C-d" . beat-select-around-word-or-next-match)
+        ("C-d" . beat-mark-around-word-or-next-match)
         ("C-<right>" . beat-right-to-boundary)
         ("C-<left>" . beat-left-to-boundary)
         ("C-<delete>" . beat-delete-right-to-boundary)
@@ -43,9 +43,9 @@ How i configure this (using [`use-package`](https://github.com/jwiegley/use-pack
 |--------------|------------|
 |`beat-dwim-kill` | Mimic VS Code functionality [C-x]: kill whole line if nothing is marked.|
 |`beat-dwim-save` | Mimic VS Code functionality [C-c]: save whole line to kill-ring if nothing is marked.|
-|`beat-delete-selection-yank` | PARTIALLY OBSOLETE! FUNCTIONALITY COVERED BY 'delete-selection-mode'. Mimic VS Code functionality [C-v]: delete marked region when| yanking.
-|`beat-select-around-word` | Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards|
-|`beat-select-around-word-or-next-match` | Mimic VS Code functionality [C-d]: If nothing is marked, select word, if something is marked, select next instance of it.|
+|`beat-delete-mark-yank` | PARTIALLY OBSOLETE! FUNCTIONALITY COVERED BY 'delete-selection-mode'. Mimic VS Code functionality [C-v]: delete marked region when| yanking.
+|`beat-mark-around-word` | Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards|
+|`beat-mark-around-word-or-next-match` | Mimic VS Code functionality [C-d]: If nothing is marked, mark word, if something is marked, mark next instance of it.|
 |`beat-duplicate-line-down` | Mimic VS Code functionality [M-S-\<down\>]: Duplicate line down.|
 |`beat-dwim-previous-line` | "Mimic VS Code behavior: Pressing up on the first line moves the cursor to column 0."|
 |`beat-delete-right-to-boundary` | Mimic VS Code functionality [C-\<delete\>]: Deletes sequences forward, with more similar rules to VS Code.|
