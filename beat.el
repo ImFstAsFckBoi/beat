@@ -114,35 +114,23 @@ If at first non white-space character, move to beginning of line"
       (beginning-of-line))))
 
 
-;; TODO:
-;; - use native char categories
-;; - don't use byte-to-string conversions
-
-(setq-default beat-char-categories
-              '((whitespace "[ \t]")
-                (newline    "[\r\n]")
-                (words      "[a-zA-Z0-9_\\-]")))
-
-(defun beat--relative-char-at (N)
-  "Get the Nth char relative to point.  Negative N gives before point, positive after point.  N = 0 gives nil."
-  (when (eq N 0)
-    (if (< N 1)
-        (char-before (+ (point) (+ N 1)))
-      (char-after  (+ (point)  (- N 1))))))
-
-(defun beat--eat-char (N)
-  "Delete N chars an return the Nth char."
-  (let ((c (beat--relative-char-at N)))
-    (delete-char N)
-    c))
+(setq-default beat--char-syntax-level-alist `((,(char-syntax ?a) . 0)
+                                              (,(char-syntax ?-) . 0)
+                                              (,(char-syntax ?/) . 0)
+                                              (,(char-syntax ?\() . 100)
+                                              (,(char-syntax ? ) . 200)
+                                              (,(char-syntax ?\n) . 300)))
 
 
 (defun beat--get-char-category (char)
-  "TODO: Replace.  Get the category of CHAR according to BEAT-CHAR-CATEGORIES."
-  (catch 'r (dolist (cat beat-char-categories)
-              (when (string-match (nth 1 cat) char)
-                (throw 'r (nth 0 cat))))))
+  "Get the category of CHAR according to `beat-char-categories'."
+  (or (cdr (assoc (char-syntax char)
+                  beat--char-syntax-level-alist))
+      999))
 
+(defun beat--category-compare (f a b)
+  "Compare the char-categories of A and B using F."
+  (apply f (mapcar 'beat--get-char-category `(,a ,b))))
 
 (defun beat--eval-or-funcall (f)
   "If F is a function, call it.  If F is an s-expression, evaluate it."
@@ -151,16 +139,18 @@ If at first non white-space character, move to beginning of line"
     (funcall f)))
 
 (defun beat--apply-to-boundary (bexp aexp)
-  "Evaluate BEXP before, and AEXP after, every char up to a boundary."
+  "Evaluate BEXP before, and AEXP after, for every char up to a character boundary."
   ;; Set b and a to same so first while always passes
   (let ((b (char-before))
-        (a (char-before)))
+        (a (char-before))
+        (count 0))
 
-    (while (eq (beat--get-char-category (byte-to-string b))
-               (beat--get-char-category (byte-to-string a)))
+    (while (or (beat--category-compare 'eq a b)
+               (and (eq count 1) (beat--category-compare '> b a)))
       (when bexp (beat--eval-or-funcall bexp))
       (setq b (char-before)
-            a (char-after))
+            a (char-after)
+            count (+ count 1))
       (when aexp (beat--eval-or-funcall aexp)))))
 
 (defun beat-delete-right-to-boundary ()
@@ -185,6 +175,23 @@ If at first non white-space character, move to beginning of line"
   "Go backward for all characters in the same char category."
   (interactive "^")
   (beat--apply-to-boundary 'left-char nil))
+
+
+;;; -- unused functions ---
+
+(defun beat--relative-char-at (N)
+  "Get the Nth char relative to point.  Negative N gives before point, positive after point.  N = 0 gives nil."
+  (when (eq N 0)
+    (if (< N 1)
+        (char-before (+ (point) (+ N 1)))
+      (char-after  (+ (point)  (- N 1))))))
+
+(defun beat--eat-char (N)
+  "Delete N chars an return the Nth char."
+  (let ((c (beat--relative-char-at N)))
+    (delete-char N)
+    c))
+
 
 (provide 'beat)
 ;;; beat.el ends here
