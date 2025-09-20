@@ -1,10 +1,11 @@
-;;; beat+.el --- Buffer Editing And Traveral Plus   -*- lexical-binding:t -*-
+;;; beat.el --- Buffer Editing And Traversal   -*- lexical-binding:t -*-
 
-;; Filename: beat+.el
-;; Description: Utility functions for Buffer Editing And Traveral (BEAT)
+;; Filename: beat.el
+;; Description: Utility functions for Buffer Editing And Traversal (BEAT)
 ;; Author: Martin Olivesten <mbao02@pm.me>
-;; Copyright (C) 2024  Martin Olivesten, all rights reserved.
+;; Copyright (C) 2025 Martin Olivesten, all rights reserved.
 ;; Created: 2024-11-16
+;; Updated: 2025-9-20
 
 ;;; This file is NOT part of GNU Emacs
 
@@ -27,7 +28,7 @@
 
 ;;; Commentary:
 ;;
-;; BEAT+ (Buffer Editing And Traversal Plus) is a collection of utility functions to aid in traversing and editing buffers in a more familiar way.
+;; BEAT (Buffer Editing And Traversal) is a collection of utility functions to aid in traversing and editing buffers in a more familiar way.
 ;; This includes a series of functionalities ported from VS Code and other such CUA text editors.
 ;; Tries to, when possible, reuse standard elisp functions and use standard Emacs naming schemes (e.g. kill, save, dwim, etc.) for all functions.
 ;;
@@ -36,7 +37,7 @@
 
 ;;; Installation:
 ;;
-;; (require 'beat+)
+;; (require 'beat)
 
 
 ;;; Require
@@ -44,22 +45,22 @@
 
 ;;; Code:
 
-(defun beatp-dwim-kill ()
+(defun beat-dwim-kill ()
   "Mimic VS Code functionality [C-x]: kill whole line if nothing is marked."
   (interactive)
   (if (region-active-p)
       (kill-region (region-beginning) (region-end))
-      (kill-region (line-beginning-position) (+ (line-end-position) 1))))
+    (kill-region (line-beginning-position) (+ (line-end-position) 1))))
 
-(defun beatp-dwim-save ()
+(defun beat-dwim-save ()
   "Mimic VS Code functionality [C-c]: save whole line to kill-ring if nothing is marked."
   (interactive)
   (if (region-active-p)
       (kill-ring-save (region-beginning) (region-end))
-      (kill-ring-save (line-beginning-position) (+ (line-end-position) 1))))
+    (kill-ring-save (line-beginning-position) (+ (line-end-position) 1))))
 
 
-(defun beatp-delete-selection-yank ()
+(defun beat-delete-selection-yank ()
   "PARTIALLY OBSOLETE! FUNCTIONALITY COVERED BY 'delete-selection-mode'.
 Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (interactive)
@@ -68,104 +69,105 @@ Mimic VS Code functionality [C-v]: delete marked region when yanking."
   (yank))
 
 
-(defun beatp-select-around-word ()
+(defun beat-select-around-word ()
   "Mimic first part of VS Code functionality [C-d]: Mark the current word, forward and backwards"
   (interactive)
   (if (not (eq (char-after) ? ))
-      (beatp-right-to-boundary))
-  (beatp-left-to-boundary)
+      (beat-right-to-boundary))
+  (beat-left-to-boundary)
   (set-mark (point))
-  (beatp-right-to-boundary)
+  (beat-right-to-boundary)
   (activate-mark))
 
-(defun beatp-select-around-word-or-next-match ()
+
+(defun beat-select-around-word-or-next-match ()
   "Mimic VS Code functionality [C-d]: If nothing is marked, select word, if something is marked, select next instance of it."
   (interactive)
   (if (region-active-p)
-    (mc/mark-next-like-this (region-beginning))
-    (beatp-select-around-word)))
+      (mc/mark-next-like-this (region-beginning))
+    (beat-select-around-word)))
 
 
-(defun beatp-duplicate-line-down ()
+(defun beat-duplicate-line-down ()
   "Mimic VS Code functionality [M-S-<down>]: Duplicate line down."
   (interactive)
   (duplicate-line)
   (next-line))
 
 
-(defun beatp-dwim-previous-line (&optional ARG)
+(defun beat-dwim-previous-line (&optional ARG)
   "Mimic VS Code behaviour: Pressing up on the first line moves the cursor to column 0."
   (interactive "^p")
   (if (eq (line-number-at-pos) 1)
       (goto-char 0)
-      (previous-line)))
+    (previous-line)))
 
 
-; TODO:
-; - use native char categories
-; - don't use byte-to-string conversions
+                                        ; TODO:
+                                        ; - use native char categories
+                                        ; - don't use byte-to-string conversions
 
-(setq-default beatp-char-categories
+(setq-default beat-char-categories
               '((whitespace "[ \t]")
                 (newline    "[\r\n]")
                 (words      "[a-zA-Z0-9_\\-]")))
 
-(defun beatp-char-at (N)
+(defun beat--char-at (N)
   (if (eq N 0) nil
     (if (< N 1)
         (char-before (+ (point) (+ N 1)))
-        (char-after  (+ (point)  (- N 1))))))
+      (char-after  (+ (point)  (- N 1))))))
 
 
-(defun beatp-eat-char (N)
-    (setq-local c (beatp-char-at N))
-    (delete-char N)
-    c)
+(defun beat-eat-char (N)
+  (setq-local c (beat--char-at N))
+  (delete-char N)
+  c)
 
 
-(defun beatp-get-char-category (char)
-  (catch 'r (dolist (cat beatp-char-categories)
+(defun beat--get-char-category (char)
+  (catch 'r (dolist (cat beat-char-categories)
               (when (string-match (nth 1 cat) char)
                 (throw 'r (nth 0 cat))))))
 
 
-(defun beatp-call-expression (f)
+(defun beat--call-expression (f)
   (if (listp f)
       (apply (car f) (cdr f))
-      (funcall f)))
+    (funcall f)))
 
-(defun beatp-apply-to-boundary (bexp aexp)
+(defun beat--apply-to-boundary (bexp aexp)
   ;; Set b and a to same so first while always passes 
   (setq-local b (char-before) a (char-before))
-  (while (eq (beatp-get-char-category (byte-to-string b))
-             (beatp-get-char-category (byte-to-string a)))
-    (if bexp (beatp-call-expression bexp))
+  (while (eq (beat--get-char-category (byte-to-string b))
+             (beat--get-char-category (byte-to-string a)))
+    (if bexp (beat--call-expression bexp))
     (setq-local b (char-before)
                 a (char-after))
-    (if aexp (beatp-call-expression aexp))))
+    (if aexp (beat--call-expression aexp))))
 
-(defun beatp-delete-right-to-boundary () 
+(defun beat-delete-right-to-boundary () 
   "Mimic VS Code functionality [C-<delete>]: Deletes sequences forward, with more similar rules to VS Code."
   (interactive)
-  (beatp-apply-to-boundary 'right-char '(delete-char -1)))
+  (beat--apply-to-boundary 'right-char '(delete-char -1)))
 
 
-(defun beatp-delete-left-to-boundary () 
+(defun beat-delete-left-to-boundary () 
   "Mimic VS Code functionality [C-<backspace>]: Deletes sequences backwards, with more similar rules to VS Code."
   (interactive)
-  (beatp-apply-to-boundary 'left-char '(delete-char 1)))
+  (beat--apply-to-boundary 'left-char '(delete-char 1)))
 
 
-(defun beatp-right-to-boundary (&optional ARG)
+(defun beat-right-to-boundary (&optional ARG)
   "Goto forward for all characters in the same char category."
   (interactive "^p")
-  (beatp-apply-to-boundary 'right-char nil))
+  (beat--apply-to-boundary 'right-char nil))
 
 
-(defun beatp-left-to-boundary (&optional ARG)
+(defun beat-left-to-boundary (&optional ARG)
   "Goto backward for all characters in the same char category."
   (interactive "^p")
-  (beatp-apply-to-boundary 'left-char nil))
+  (beat--apply-to-boundary 'left-char nil))
 
-
-;;; beat+.el ends here
+(provide 'beat)
+;;; beat.el ends here
