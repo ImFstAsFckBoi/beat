@@ -1,11 +1,15 @@
-;;; beat.el --- Buffer Editing And Traversal   -*- lexical-binding:t -*-
+;;; beat.el --- Buffer Editing And Traversal  -*- lexical-binding:t -*-
+
+;; Copyright (C) 2025  Martin Olivesten
 
 ;; Filename: beat.el
-;; Description: Utility functions for Buffer Editing And Traversal (BEAT)
 ;; Author: Martin Olivesten <mbao02@pm.me>
-;; Copyright (C) 2025 Martin Olivesten, all rights reserved.
+;; URL: https://github.com/ImFstAsFckBoi/beat
+;; Description: Utility functions for Buffer Editing And Traversal (BEAT)
 ;; Created: 2024-11-16
 ;; Updated: 2025-9-20
+;; Package-Version: 1.0
+;; Package-Requires: ((emacs "28.1") (compat "30") (multiple-cursors "1.5.0")
 
 ;;; This file is NOT part of GNU Emacs
 
